@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bing.search": "^1.0.1",
     "express": "^4.14.0"
   }
 }

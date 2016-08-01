@@ -1,4 +1,5 @@
 var express = require('express');
+var search = require('bing.search');
 var app = express();
 var port = process.env.PORT || 8080;
 
@@ -6,17 +7,25 @@ app.get('/', function (req, res) {
 	res.sendFile(process.cwd() + '/public/index.html');
 });
 
-app.get('/api/whoami', function(req, res) {
-	var ip = req.headers['x-forwarded-for'] || 
-	req.connection.remoteAddress || 
-	req.socket.remoteAddress ||
-	req.connection.socket.remoteAddress;
-	var info = {
-		'ip-address': ip,
-		'language': req.headers["accept-language"].split(',')[0],
-		'software': req.headers['user-agent'].split(') ')[0].split(' (')[1]
-	};
-	res.send(info);
+app.get('/:query', function(req, res) {
+	var query = req.params.query;
+	var size = req.query.offset || 10;
+	var search = new Search(process.env.BING_API_KEY);
+	search.images(query, {
+		top: size
+	}, function(err, results) {
+		if (err) throw err;
+		res.send(results.map(makeList));
+	});
+	
+	function makeList(img) {
+		return {
+			"url": img.url,
+			"snippet": img.title,
+			"thumbnail": img.thumbnail.url,
+			"context": img.sourceUrl
+		};
+	}
 });
 
 app.listen(port, function () {
