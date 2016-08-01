@@ -1,33 +1,27 @@
 var express = require('express');
 var search = require('bing.search');
+var mongodb = require('mongodb');
+var api = require('./api/img-sal.js');
 var app = express();
 var port = process.env.PORT || 8080;
+var MongoClient = mongodb.MongoClient;
+var url = 'mongodb://localhost:27017/history';
 
-app.get('/', function (req, res) {
-	res.sendFile(process.cwd() + '/public/index.html');
-});
+MongoClient.connect(process.env.MONGOLAB_URI || url, 
+	function(err, db) {
+		if (err) {
+			throw new Error('Database failed to connect!');
+		} else {
+			console.log('Successfully connected to MongoDB on port 27017.');
+		}
 
-app.get('/:query', function(req, res) {
-	var query = req.params.query;
-	var size = req.query.offset || 10;
-	var search = new Search(process.env.BING_API_KEY);
-	search.images(query, {
-		top: size
-	}, function(err, results) {
-		if (err) throw err;
-		res.send(results.map(makeList));
+		api(app, db);
+
+		app.get('/', function (req, res) {
+			res.sendFile(process.cwd() + '/public/index.html');
+		});
+
+		app.listen(port, function () {
+			console.log('Example app listening on port ' + port);
+		});
 	});
-	
-	function makeList(img) {
-		return {
-			"url": img.url,
-			"snippet": img.title,
-			"thumbnail": img.thumbnail.url,
-			"context": img.sourceUrl
-		};
-	}
-});
-
-app.listen(port, function () {
-	console.log('Example app listening on port ' + port);
-});
