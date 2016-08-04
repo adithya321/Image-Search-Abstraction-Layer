@@ -4,7 +4,7 @@ module.exports = function(app, db) {
   app.get('/:query', function(req, res) {
     var query = req.params.query;
     var size = req.query.offset || 10;
-    var search = new Search(process.env.BING_API_KEY);
+    //var search = new Search(process.env.BING_API_KEY);
     
     var history = {
       "term": query,
