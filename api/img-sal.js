@@ -11,13 +11,13 @@ module.exports = function(app, db) {
       "when": new Date().toLocaleString()
     };
     save(history);
-    
-    search.images(query, {
+
+    /*search.images(query, {
       top: size
     }, function(err, results) {
       if (err) throw err;
       res.send(results.map(makeList));
-    });
+    });*/
 
     function makeList(img) {
       return {
@@ -32,7 +32,7 @@ module.exports = function(app, db) {
   function save(obj, db) {
     historyDB.save(obj, function(err, result) {
       if (err) throw err;
-      console.log('Saved ' + result);
+      res.send('Saved ' + result);
     });
   }
 };
